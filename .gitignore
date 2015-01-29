@@ -31,3 +31,7 @@ install/win32/meta.py
 /man/
 /share/
 /src/
+
+# CAD ignores
+cad/
+extra/
