@@ -320,6 +320,11 @@ class stock_quant(osv.osv):
         'company_id': lambda self, cr, uid, c: self.pool.get('res.company')._company_default_get(cr, uid, 'stock.quant', context=c),
     }
 
+    def init(self, cr):
+        cr.execute('SELECT indexname FROM pg_indexes WHERE indexname = %s', ('stock_quant_product_location_index',))
+        if not cr.fetchone():
+            cr.execute('CREATE INDEX stock_quant_product_location_index ON stock_quant (product_id, location_id, company_id, qty, in_date, reservation_id)')
+
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=True):
         ''' Overwrite the read_group in order to sum the function field 'inventory_value' in group by'''
         res = super(stock_quant, self).read_group(cr, uid, domain, fields, groupby, offset=offset, limit=limit, context=context, orderby=orderby, lazy=lazy)
@@ -411,7 +416,12 @@ class stock_quant(osv.osv):
             self.move_quants_write(cr, uid, to_move_quants, move, location_to, dest_package_id, context=context)
             self.pool.get('stock.move').recalculate_move_state(cr, uid, to_recompute_move_ids, context=context)
         if location_to.usage == 'internal':
-            if self.search(cr, uid, [('product_id', '=', move.product_id.id), ('qty','<', 0)], limit=1, context=context):
+            # Do manual search for quant to avoid full table scan (order by id)
+            cr.execute("""
+                SELECT 0 FROM stock_quant, stock_location WHERE product_id = %s AND stock_location.id = stock_quant.location_id AND
+                ((stock_location.parent_left >= %s AND stock_location.parent_left < %s) OR stock_location.id = %s) AND qty < 0.0 LIMIT 1
+            """, (move.product_id.id, location_to.parent_left, location_to.parent_right, location_to.id))
+            if cr.fetchone():
                 for quant in quants_reconcile:
                     self._quant_reconcile_negative(cr, uid, quant, move, context=context)
 
@@ -525,7 +535,10 @@ class stock_quant(osv.osv):
             return False
         qty_round = float_round(qty, precision_rounding=rounding)
         new_qty_round = float_round(quant.qty - qty, precision_rounding=rounding)
-        new_quant = self.copy(cr, SUPERUSER_ID, quant.id, default={'qty': new_qty_round, 'history_ids': [(4, x.id) for x in quant.history_ids]}, context=context)
+        # Fetch the history_ids manually as it will not do a join with the stock moves then (=> a lot faster)
+        cr.execute("""SELECT move_id FROM stock_quant_move_rel WHERE quant_id = %s""", (quant.id,))
+        res = cr.fetchall()
+        new_quant = self.copy(cr, SUPERUSER_ID, quant.id, default={'qty': new_qty_round, 'history_ids': [(4, x[0]) for x in res]}, context=context)
         self.write(cr, SUPERUSER_ID, quant.id, {'qty': qty_round}, context=context)
         return self.browse(cr, uid, new_quant, context=context)
 
@@ -1059,7 +1072,7 @@ class stock_picking(osv.osv):
                     'product_qty': 1.0,
                     'location_id': pack.location_id.id,
                     'location_dest_id': quants_suggested_locations[pack_quants[0]],
-                    'owner_id': picking.owner_id.id,
+                    'owner_id': pack.owner_id.id,
                 })
             #remove the quants inside the package so that they are excluded from the rest of the computation
             for quant in pack_quants:
@@ -1833,6 +1846,10 @@ class stock_move(osv.osv):
             'You try to move a product using a UoM that is not compatible with the UoM of the product moved. Please use an UoM in the same UoM category.',
             ['product_uom']),
     ]
+    def init(self, cr):
+        cr.execute('SELECT indexname FROM pg_indexes WHERE indexname = %s', ('stock_move_product_location_index',))
+        if not cr.fetchone():
+            cr.execute('CREATE INDEX stock_move_product_location_index ON stock_move (product_id, location_id, location_dest_id, company_id, state)')
 
     @api.cr_uid_ids_context
     def do_unreserve(self, cr, uid, move_ids, context=None):
@@ -3683,9 +3700,28 @@ class stock_package(osv.osv):
         """Returns packages from quants for store"""
         res = set()
         for quant in self.browse(cr, uid, ids, context=context):
-            if quant.package_id:
-                res.add(quant.package_id.id)
+            pack = quant.package_id
+            while pack:
+                res.add(pack.id)
+                pack = pack.parent_id
         return list(res)
+
+    def _get_package_info(self, cr, uid, ids, name, args, context=None):
+        quant_obj = self.pool.get("stock.quant")
+        default_company_id = self.pool.get('res.users').browse(cr, uid, uid, context=context).company_id.id
+        res = dict((res_id, {'location_id': False, 'company_id': default_company_id, 'owner_id': False}) for res_id in ids)
+        for pack in self.browse(cr, uid, ids, context=context):
+            quants = quant_obj.search(cr, uid, [('package_id', 'child_of', pack.id)], context=context)
+            if quants:
+                quant = quant_obj.browse(cr, uid, quants[0], context=context)
+                res[pack.id]['location_id'] = quant.location_id.id
+                res[pack.id]['owner_id'] = quant.owner_id.id
+                res[pack.id]['company_id'] = quant.company_id.id
+            else:
+                res[pack.id]['location_id'] = False
+                res[pack.id]['owner_id'] = False
+                res[pack.id]['company_id'] = False
+        return res
 
     def _get_packages_to_relocate(self, cr, uid, ids, context=None):
         res = set()
@@ -3694,20 +3730,6 @@ class stock_package(osv.osv):
             if pack.parent_id:
                 res.add(pack.parent_id.id)
         return list(res)
-
-    def _get_package_info(self, cr, uid, ids, name, args, context=None):
-        default_company_id = self.pool.get('res.users').browse(cr, uid, uid, context=context).company_id.id
-        res = dict((res_id, {'location_id': False, 'company_id': default_company_id, 'owner_id': False}) for res_id in ids)
-        for pack in self.browse(cr, uid, ids, context=context):
-            if pack.quant_ids:
-                res[pack.id]['location_id'] = pack.quant_ids[0].location_id.id
-                res[pack.id]['owner_id'] = pack.quant_ids[0].owner_id and pack.quant_ids[0].owner_id.id or False
-                res[pack.id]['company_id'] = pack.quant_ids[0].company_id.id
-            elif pack.children_ids:
-                res[pack.id]['location_id'] = pack.children_ids[0].location_id and pack.children_ids[0].location_id.id or False
-                res[pack.id]['owner_id'] = pack.children_ids[0].owner_id and pack.children_ids[0].owner_id.id or False
-                res[pack.id]['company_id'] = pack.children_ids[0].company_id and pack.children_ids[0].company_id.id or False
-        return res
 
     _columns = {
         'name': fields.char('Package Reference', select=True, copy=False),
