@@ -356,7 +356,7 @@ instance.web.ListView = instance.web.View.extend( /** @lends instance.web.ListVi
         //Sort
         var default_order = this.fields_view.arch.attrs.default_order,
             unsorted = !this.dataset._sort.length;
-        if (unsorted && default_order) {
+        if (unsorted && default_order && !this.grouped) {
             this.dataset.set_sort(default_order.split(','));
         }
 
@@ -2235,7 +2235,7 @@ instance.web.list.Column = instance.web.Class.extend({
         }
         if (attrs.invisible) { return ''; }
 
-        if (!(row_data[this.id] && row_data[this.id].value)) {
+        if (!row_data[this.id]) {
             return options.value_if_empty === undefined
                     ? ''
                     : options.value_if_empty;
