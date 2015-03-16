@@ -32,10 +32,7 @@ install/win32/meta.py
 /man/
 /share/
 /src/
-<<<<<<< HEAD
 
 # CAD ignored directories
 cad/
 extra/
-=======
->>>>>>> 1553ac99e1b697d4925facc59876caa2c7628b7e
