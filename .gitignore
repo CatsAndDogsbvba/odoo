@@ -36,3 +36,4 @@ install/win32/meta.py
 # CAD ignored directories
 cad/
 extra/
+derigo/
