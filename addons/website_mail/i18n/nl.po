@@ -374,7 +374,7 @@ msgstr "Tekst-afbeelding"
 #. module: website_mail
 #: view:website:website_mail.follow
 msgid "Thanks for your subscription!"
-msgstr "Bedankt voor uw aanmelding!"
+msgstr "Bedankt voor uw inschrijving!"
 
 #. module: website_mail
 #: code:addons/website_mail/models/mail_message.py:88

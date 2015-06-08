@@ -1178,7 +1178,7 @@ msgstr "Bedankt"
 #. module: mass_mailing
 #: view:website:website.snippets
 msgid "Thanks for your subscription!"
-msgstr "Bedankt voor uw aanmelding!"
+msgstr "Bedankt voor uw inschrijving!"
 
 #. module: mass_mailing
 #: help:mail.mass_mailing.contact,opt_out:0
