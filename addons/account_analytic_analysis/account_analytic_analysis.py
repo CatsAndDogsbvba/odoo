@@ -260,7 +260,7 @@ class account_analytic_account(osv.osv):
 
     def _ca_invoiced_calc(self, cr, uid, ids, name, arg, context=None):
         module_obj = self.pool.get('ir.module.module')
-        sale_analytic_plans = module_obj.search(cr, uid, [('name', '=like', 'sale_analytic_plans'), ('status', '=like', 'installed')], context=context)
+        sale_analytic_plans = module_obj.search(cr, uid, [('name', '=like', 'sale_analytic_plans'), ('state', '=like', 'installed')], context=context)
         res = {}
         res_final = {}
         child_ids = tuple(ids) #We don't want consolidation for each of these fields because those complex computation is resource-greedy.
