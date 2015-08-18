@@ -259,8 +259,8 @@ class account_analytic_account(osv.osv):
         return res
 
     def _ca_invoiced_calc(self, cr, uid, ids, name, arg, context=None):
-        account_config_obj = self.pool.get('account.config.settings')
-        last_config_id = max(account_config_obj.search(cr, uid, [], context=context))
+        module_obj = self.pool.get('ir.module.module')
+        sale_analytic_plans = module_obj.search(cr, uid, [('name', '=like', 'sale_analytic_plans'), ('status', '=like', 'installed')], context=context)
         res = {}
         res_final = {}
         child_ids = tuple(ids) #We don't want consolidation for each of these fields because those complex computation is resource-greedy.
@@ -272,17 +272,15 @@ class account_analytic_account(osv.osv):
             inv_line_obj = self.pool.get("account.invoice.line")
             invoices = []
             inv_lines = []
-            if last_config_id:
-                config_br = account_config_obj.browse(cr, uid, last_config_id, context=context)
-                if config_br and config_br.module_sale_analytic_plans:
-                    # This will search for invoice lines through linked SO's
-                    inv_obj = self.pool.get("account.invoice")
-                    sale_order_obj = self.pool.get("sale.order")
-                    sale_orders = sale_order_obj.search(cr, uid, [('project_id', 'in', child_ids)], context=context)
-                    for line in sale_order_obj.browse(cr, uid, sale_orders, context=context):
-                        # Get the invoices
-                        invoices.extend(inv_obj.search(cr, uid, [('origin', '=', line.name), ('state', 'not in', ['draft', 'cancel']), ('type', 'in', ['out_invoice', 'out_refund'])], context=context))
-                    inv_lines = inv_line_obj.search(cr, uid, [('invoice_id', 'in', invoices)], context=context)
+            if sale_analytic_plans:
+                # This will search for invoice lines through linked SO's
+                inv_obj = self.pool.get("account.invoice")
+                sale_order_obj = self.pool.get("sale.order")
+                sale_orders = sale_order_obj.search(cr, uid, [('project_id', 'in', child_ids)], context=context)
+                for line in sale_order_obj.browse(cr, uid, sale_orders, context=context):
+                    # Get the invoices
+                    invoices.extend(inv_obj.search(cr, uid, [('origin', '=', line.name), ('state', 'not in', ['draft', 'cancel']), ('type', 'in', ['out_invoice', 'out_refund'])], context=context))
+                inv_lines = inv_line_obj.search(cr, uid, [('invoice_id', 'in', invoices)], context=context)
             if not inv_lines:
                 #Search all invoice lines not in cancelled state that refer to this analytic account
                 inv_lines = inv_line_obj.search(cr, uid, ['&', ('account_analytic_id', 'in', child_ids), ('invoice_id.state', 'not in', ['draft', 'cancel']), ('invoice_id.type', 'in', ['out_invoice', 'out_refund'])], context=context)
