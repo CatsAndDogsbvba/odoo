@@ -262,7 +262,6 @@ class account_analytic_account(osv.osv):
         module_obj = self.pool.get('ir.module.module')
         sale_analytic_plans = module_obj.search(cr, uid, [('name', '=like', 'sale_analytic_plans'), ('state', '=like', 'installed')], context=context)
         res = {}
-        res_final = {}
         child_ids = tuple(ids) #We don't want consolidation for each of these fields because those complex computation is resource-greedy.
         for i in child_ids:
             res[i] =  0.0
@@ -270,17 +269,16 @@ class account_analytic_account(osv.osv):
             return res
         if child_ids:
             inv_line_obj = self.pool.get("account.invoice.line")
-            invoices = []
+            invoice_lines = []
             inv_lines = []
             if sale_analytic_plans:
                 # This will search for invoice lines through linked SO's
-                inv_obj = self.pool.get("account.invoice")
                 sale_order_obj = self.pool.get("sale.order")
                 sale_orders = sale_order_obj.search(cr, uid, [('project_id', 'in', child_ids)], context=context)
-                for line in sale_order_obj.browse(cr, uid, sale_orders, context=context):
-                    # Get the invoices
-                    invoices.extend(inv_obj.search(cr, uid, [('origin', '=', line.name), ('state', 'not in', ['draft', 'cancel']), ('type', 'in', ['out_invoice', 'out_refund'])], context=context))
-                inv_lines = inv_line_obj.search(cr, uid, [('invoice_id', 'in', invoices)], context=context)
+                sale_lines = self.pool.get('sale.order.line').search(cr, uid, [('order_id', 'in', sale_orders)], context=context)
+                for line in self.pool.get('sale.order.line').browse(cr, uid, sale_lines, context=context):
+                    invoice_lines.append(line.invoice_lines.id)
+                inv_lines = inv_line_obj.search(cr, uid, [('id', 'in', invoice_lines)], context=context)
             if not inv_lines:
                 #Search all invoice lines not in cancelled state that refer to this analytic account
                 inv_lines = inv_line_obj.search(cr, uid, ['&', ('account_analytic_id', 'in', child_ids), ('invoice_id.state', 'not in', ['draft', 'cancel']), ('invoice_id.type', 'in', ['out_invoice', 'out_refund'])], context=context)
