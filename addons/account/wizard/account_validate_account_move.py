@@ -58,7 +58,8 @@ class validate_account_move_lines(osv.osv_memory):
         move_ids = list(set(move_ids))
         if not move_ids:
             raise osv.except_osv(_('Warning!'), _('Selected Entry Lines does not have any account move entries in draft state.'))
-        obj_move.button_validate(cr, uid, move_ids, context)
+        for move in move_ids:
+            obj_move.button_validate(cr, uid, move, context)
         return {'type': 'ir.actions.act_window_close'}
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

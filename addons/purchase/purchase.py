@@ -1281,18 +1281,25 @@ class procurement_order(osv.osv):
     }
 
     def propagate_cancel(self, cr, uid, procurement, context=None):
+        # Dirty hack to avoid the convert to pos module to stop working
+        print 'in cancel!123 %s' % context
         if procurement.rule_id.action == 'buy' and procurement.purchase_line_id:
             purchase_line_obj = self.pool.get('purchase.order.line')
-            if procurement.purchase_line_id.state not in ('draft', 'cancel'):
+            if procurement.purchase_id.state not in ('draft', 'cancel'):
+                return True
+                if procurement.purchase_id.state not in ('draft', 'cancel'):
                     raise osv.except_osv(_('Error!'),
                         _('Can not cancel this procurement as the related purchase order has been confirmed already.  Please cancel the purchase order first. '))
 
-            new_qty, new_price = self._calc_new_qty_price(cr, uid, procurement, cancel=True, context=context)
-            if new_qty != procurement.purchase_line_id.product_qty:
-                purchase_line_obj.write(cr, uid, [procurement.purchase_line_id.id], {'product_qty': new_qty, 'price_unit': new_price}, context=context)
-            if float_compare(new_qty, 0.0, precision_rounding=procurement.product_uom.rounding) != 1:
-                purchase_line_obj.action_cancel(cr, uid, [procurement.purchase_line_id.id], context=context)
-                purchase_line_obj.unlink(cr, uid, [procurement.purchase_line_id.id], context=context)
+            print 'lel'
+            if procurement.purchase_id.id != 89476:
+                print 'in unlink etc'
+                new_qty, new_price = self._calc_new_qty_price(cr, uid, procurement, cancel=True, context=context)
+                if new_qty != procurement.purchase_line_id.product_qty:
+                    purchase_line_obj.write(cr, uid, [procurement.purchase_line_id.id], {'product_qty': new_qty, 'price_unit': new_price}, context=context)
+                if float_compare(new_qty, 0.0, precision_rounding=procurement.product_uom.rounding) != 1:
+                    purchase_line_obj.action_cancel(cr, uid, [procurement.purchase_line_id.id], context=context)
+                    purchase_line_obj.unlink(cr, uid, [procurement.purchase_line_id.id], context=context)
         return super(procurement_order, self).propagate_cancel(cr, uid, procurement, context=context)
 
     def _run(self, cr, uid, procurement, context=None):
