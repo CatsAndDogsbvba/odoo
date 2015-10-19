@@ -1337,14 +1337,33 @@ class product_product(osv.Model):
     _inherit = 'product.product'
 
     def _sales_count(self, cr, uid, ids, field_name, arg, context=None):
-        r = dict.fromkeys(ids, 0)
-        domain = [
-            ('state', 'in', ['confirmed', 'done']),
-            ('product_id', 'in', ids),
-        ]
-        for group in self.pool['sale.report'].read_group(cr, uid, domain, ['product_id', 'product_uom_qty'], ['product_id'], context=context):
-            r[group['product_id'][0]] = group['product_uom_qty']
-        return r
+        print ids
+        print 'sale_count'
+        Sales = self.pool['sale.order']
+        Pos = self.pool['pos.order']
+        sale = {
+            product_id: Sales.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('order_line.product_id', '=', product_id)], context=context)
+            for product_id in ids
+        }
+        print sale
+        pos = {
+            product_id: Pos.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('lines.product_id', '=', product_id)], context=context)
+            for product_id in ids
+        }
+        print pos
+        for x, y in zip(sale.iteritems(), pos.iteritems()):
+            print x[1], y[1]
+            res = {x[0]: x[1]+y[1]}
+        print res
+        return res
+        # r = dict.fromkeys(ids, 0)
+        # domain = [
+        #     ('state', 'in', ['confirmed', 'done']),
+        #     ('product_id', 'in', ids),
+        # ]
+        # for group in self.pool['sale.report'].read_group(cr, uid, domain, ['product_id', 'product_uom_qty'], ['product_id'], context=context):
+        #     r[group['product_id'][0]] = group['product_uom_qty']
+        # return r
 
     def action_view_sales(self, cr, uid, ids, context=None):
         result = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'sale.action_order_line_product_tree', raise_if_not_found=True)
