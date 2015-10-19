@@ -67,7 +67,7 @@ $(document).ready(function () {
                     });
 
                     $modal.find('input[name="add_qty"]').val(quantity).change();
-                    $('ul.js_add_cart_variants').each(function () {
+                    $('.js_add_cart_variants').each(function () {
                         $('input.js_variant_change, select.js_variant_change', this).first().trigger('change');
                     });
 
@@ -78,7 +78,7 @@ $(document).ready(function () {
                         var qty = $dom.find('input[name="add_qty"]').val();
                         var product_ids = [product_id];
                         var $products_dom = [];
-                        $modal.find("ul.js_add_cart_variants[data-attribute_value_ids]").each(function(){
+                        $modal.find(".js_add_cart_variants[data-attribute_value_ids]").each(function(){
                             var $el = $(this);
                             $products_dom.push($el);
                             _.each($el.data("attribute_value_ids"), function (values) {
