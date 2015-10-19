@@ -1,7 +1,7 @@
 $(document).ready(function () {
-    if(! $("ul.js_add_cart_variants[data-attribute_value_ids]").length){
-        return;
-    }
+//    if(! $("ul.js_add_cart_variants[data-attribute_value_ids]").length){
+//        return;
+//    }
     $('.oe_website_sale #add_to_cart, .oe_website_sale #products_grid .a-submit')
         .off('click')
         .removeClass('a-submit')
@@ -33,7 +33,11 @@ $(document).ready(function () {
                             data: {lang: openerp.website.get_context().lang},
                             success: function (quantity) {
                                 if (!$a.hasClass('js_goto_shop')) {
+                                    console.log('clicked ocntinue?');
                                     window.location.href = window.location.href.replace(/shop([\/?].*)?$/, "shop/cart");
+                                }
+                                else {
+                                    window.location.href = window.location.href.replace(/shop([\/?].*)?$/, "shop");
                                 }
                                 var $q = $(".my_cart_quantity");
                                 $q.parent().parent().removeClass("hidden", !quantity);
@@ -91,7 +95,7 @@ $(document).ready(function () {
                                 $products_dom[i].attr("data-attribute_value_ids", JSON.stringify(current)).trigger("change");
                             }
                             $dom.find(".oe_price .oe_currency_value").text(data[product_id].toFixed(2));
-                            $dom.find('.text-danger.oe_default_price').toggle(data[product_id]<default_price && (default_price-data[product_id]>default_price/100)).css('text-decoration', 'line-through');
+//                            $dom.find('.text-danger.oe_default_price').toggle(data[product_id]<default_price && (default_price-data[product_id]>default_price/100)).css('text-decoration', 'line-through');
                         });
                     });
                 });
