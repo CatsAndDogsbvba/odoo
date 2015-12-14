@@ -33,11 +33,10 @@ $(document).ready(function () {
                             data: {lang: openerp.website.get_context().lang},
                             success: function (quantity) {
                                 if (!$a.hasClass('js_goto_shop')) {
-                                    console.log('clicked ocntinue?');
                                     window.location.href = window.location.href.replace(/shop([\/?].*)?$/, "shop/cart");
                                 }
                                 else {
-                                    window.location.href = window.location.href.replace(/shop([\/?].*)?$/, "shop");
+                                    window.location.href = window.location.href.replace(/shop([\/?].*)?$/, "shop/category/filtersystemen-3");
                                 }
                                 var $q = $(".my_cart_quantity");
                                 $q.parent().parent().removeClass("hidden", !quantity);
