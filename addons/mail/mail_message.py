@@ -792,6 +792,12 @@ class mail_message(osv.Model):
         return message_id
 
     def create(self, cr, uid, values, context=None):
+        if values.get('subtype_id', False) and values.get('model', False) and values.get('res_id', False):
+            is_duplicate = self.search(cr, uid, [('subtype_id', '=', values['subtype_id']),
+                                                 ('model', '=', values['model']),
+                                                 ('res_id', '=', values['res_id'])])
+            if is_duplicate:
+                return False
         context = dict(context or {})
         default_starred = context.pop('default_starred', False)
 
