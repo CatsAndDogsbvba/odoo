@@ -511,6 +511,7 @@ class sale_order(osv.osv):
         return True
 
     def action_invoice_create(self, cr, uid, ids, grouped=False, states=None, date_invoice = False, context=None):
+        print 'in here, bro.'
         if states is None:
             states = ['confirmed', 'done', 'exception']
         res = False
@@ -1340,25 +1341,27 @@ class product_product(osv.Model):
     _inherit = 'product.product'
 
     def _sales_count(self, cr, uid, ids, field_name, arg, context=None):
-        print ids
-        print 'sale_count'
+        # print ids
+        # print 'sale_count'
         Sales = self.pool['sale.order']
-        Pos = self.pool['pos.order']
+        # Pos = self.pool['pos.order']
         sale = {
             product_id: Sales.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('order_line.product_id', '=', product_id)], context=context)
             for product_id in ids
         }
         print sale
-        pos = {
-            product_id: Pos.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('lines.product_id', '=', product_id)], context=context)
-            for product_id in ids
-        }
-        print pos
-        for x, y in zip(sale.iteritems(), pos.iteritems()):
-            print x[1], y[1]
-            res = {x[0]: x[1]+y[1]}
-        print res
-        return res
+        return sale
+        # pos = {
+        #     product_id: Pos.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('lines.product_id', '=', product_id)], context=context)
+        #     for product_id in ids
+        # }
+        # print pos
+        # for x, y in zip(sale.iteritems(), pos.iteritems()):
+        #     print x[1], y[1]
+        #     res = {x[0]: x[1]+y[1]}
+        # print res
+        # return res
+
         # r = dict.fromkeys(ids, 0)
         # domain = [
         #     ('state', 'in', ['confirmed', 'done']),
