@@ -881,11 +881,8 @@ class mail_message(osv.Model):
             partners_to_notify |= set([p.id for p in message.partner_ids])
 
         # notify
-        # Add mail_notify_noemail to context in order to not send mails to clients
-        ctx = context.copy()
-        ctx['mail_notify_noemail'] = True
         notification_obj._notify(
-            cr, uid, newid, partners_to_notify=list(partners_to_notify), context=ctx,
+            cr, uid, newid, partners_to_notify=list(partners_to_notify), context=context,
             force_send=force_send, user_signature=user_signature
         )
         message.refresh()
