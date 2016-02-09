@@ -714,8 +714,8 @@ class product_template(osv.osv):
                         variant_ids_to_active.append(product_id.id)
                 else:
                     variants_inactive.append(product_id)
-            if variant_ids_to_active:
-                product_obj.write(cr, uid, variant_ids_to_active, {'active': True}, context=ctx)
+            # if variant_ids_to_active:
+            #     product_obj.write(cr, uid, variant_ids_to_active, {'active': True}, context=ctx)
 
             # create new product
             for variant_ids in all_variants:
