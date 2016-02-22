@@ -1351,7 +1351,7 @@ class product_product(osv.Model):
             product_id: Sales.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('order_line.product_id', '=', product_id)], context=context)
             for product_id in ids
         }
-        print sale
+        # print sale
         return sale
         # pos = {
         #     product_id: Pos.search_count(cr,uid, [('state', 'in', ['confirmed', 'done']), ('lines.product_id', '=', product_id)], context=context)
