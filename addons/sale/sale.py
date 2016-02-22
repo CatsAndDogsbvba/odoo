@@ -513,7 +513,7 @@ class sale_order(osv.osv):
         return True
 
     def action_invoice_create(self, cr, uid, ids, grouped=False, states=None, date_invoice = False, context=None):
-        print 'in here, bro.'
+        # print 'in here, bro.'
         if states is None:
             states = ['confirmed', 'done', 'exception']
         res = False
