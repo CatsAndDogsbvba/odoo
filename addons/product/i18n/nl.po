@@ -1746,7 +1746,7 @@ msgid ""
 "Lead time in days between the confirmation of the purchase order and the "
 "receipt of the products in your warehouse. Used by the scheduler for "
 "automatic computation of the purchase order planning."
-msgstr "Levertijd in dagen tussen de bevestiging van de inkooporder en de ontvangst van de producten in het magazijn. Dit wordt gebruikt door de palnner voor het automatisch berekenen van de inkoop planning.\""
+msgstr "Levertijd in dagen tussen de bevestiging van de inkooporder en de ontvangst van de producten in het magazijn. Dit wordt gebruikt door de planner voor het automatisch berekenen van de inkoop planning.\""
 
 #. module: product
 #: field:product.category,parent_left:0
