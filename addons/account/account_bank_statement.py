@@ -30,6 +30,8 @@ import time
 
 class account_bank_statement(osv.osv):
     def create(self, cr, uid, vals, context=None):
+        if not context:
+            context = {}
         if vals.get('name', '/') == '/':
             journal_id = vals.get('journal_id', self._default_journal_id(cr, uid, context=context))
             vals['name'] = self._compute_default_statement_name(cr, uid, journal_id, context=dict(context, period_id=vals.get('period_id')))
@@ -922,7 +924,7 @@ class account_bank_statement_line(osv.osv):
         user = self.pool.get("res.users").browse(cr, uid, uid)
         return ['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id]), ('journal_entry_id', '=', False), ('account_id', '=', False)]
 
-    _order = "statement_id desc, sequence"
+    _order = "statement_id desc, sequence, id"
     _name = "account.bank.statement.line"
     _description = "Bank Statement Line"
     _inherit = ['ir.needaction_mixin']
