@@ -165,7 +165,7 @@ class res_company(osv.osv):
             email            and '%s: %s' % (_('Email'), email),
             website          and '%s: %s' % (_('Website'), website),
             vat              and '%s: %s' % (_('TIN'), vat),
-            company_registry and '%s: %s' % (_('Reg'), company_registry),
+            #company_registry and '%s: %s' % (_('Reg'), company_registry),
         ]))
         # second line: bank accounts
         res_partner_bank = self.pool.get('res.partner.bank')
