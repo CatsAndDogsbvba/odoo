@@ -1498,7 +1498,7 @@ class procurement_order(osv.osv):
             else:
                 supplierinfo_obj = self.pool.get('product.supplierinfo')
                 supplierinfo_ids = supplierinfo_obj.search(cr, uid, [('name', '=', po_line.order_id.partner_id.id), ('product_tmpl_id', '=', po_line.product_id.product_tmpl_id.id)])
-                supplierinfo_min_qty = supplierinfo_obj.browse(cr, uid, supplierinfo_ids).min_qty
+                supplierinfo_min_qty = supplierinfo_obj.browse(cr, uid, supplierinfo_ids[0]).min_qty
 
         if supplierinfo_min_qty == 0.0:
             qty += po_line.product_qty
