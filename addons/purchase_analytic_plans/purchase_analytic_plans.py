@@ -29,7 +29,9 @@ class purchase_order_line(osv.osv):
         'analytics_id': fields.many2one('account.analytic.plan.instance', 'Analytic Distribution'),
     }
 
-    def onchange_product_id(self, cr, uid, ids, pricelist_id, product_id, qty, uom_id, name=False, price_unit=False, state='draft', context=None):
+    def onchange_product_id(self, cr, uid, ids, pricelist_id, product_id, qty, uom_id,
+                            partner_id, date_order=False, fiscal_position_id=False, date_planned=False,
+                            name=False, price_unit=False, state='draft', context=None):
 
         if context is None:
             context = {}
