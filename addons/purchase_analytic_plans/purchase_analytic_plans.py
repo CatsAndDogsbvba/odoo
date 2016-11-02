@@ -29,27 +29,17 @@ class purchase_order_line(osv.osv):
         'analytics_id': fields.many2one('account.analytic.plan.instance', 'Analytic Distribution'),
     }
 
-
-    def onchange_product_id(self, cr, uid, ids, pricelist_id, product_id, qty, uom_id,
-
-        name=False, price_unit=False, state='draft', context=None):
+    def onchange_product_id(self, cr, uid, ids, pricelist_id, product_id, qty, uom_id, name=False, price_unit=False, state='draft', context=None):
 
         if context is None:
             context = {}
 
-        res = super(purchase_order_line, self).onchange_product_id(cr, uid, ids, pricelist_id, product_id, qty, uom_id,
-            partner_id, date_order, fiscal_position_id, date_planned,
-            name, price_unit, state, context=context)
-
+        res = super(purchase_order_line, self).onchange_product_id(cr, uid, ids, pricelist_id, product_id, qty, uom_id, partner_id, date_order, fiscal_position_id, date_planned, name, price_unit, state, context=context)
         anal_def_obj = self.pool.get('account.analytic.default')
-
-        rec = anal_def_obj.account_get(
-            cr, uid, product_id, partner_id, uid, time.strftime('%Y-%m-%d'), context=context)
+        rec = anal_def_obj.account_get(cr, uid, product_id, partner_id, uid, time.strftime('%Y-%m-%d'), context=context)
 
         if rec:
- 
             res['value'].update({'analytics_id': rec.analytics_id.id})
-
         return res
 
 class purchase_order(osv.osv):
