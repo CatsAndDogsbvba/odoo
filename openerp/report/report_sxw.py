@@ -316,7 +316,10 @@ class rml_parse(object):
             # When we print only one record, we can auto-set the correct
             # company in the localcontext. For other cases the report
             # will have to call setCompany() inside the main repeatIn loop.
-            self.setCompany(objects[0].company_id)
+            # SONNYEDIT 06/12/2016: check if the company of the object is the same as the user's company.
+            user = self.pool['res.users'].browse(self.cr, self.uid, self.uid, self.context)
+            if user.company_id == objects[0].company_id:
+                self.setCompany(objects[0].company_id)
 
 class report_sxw(report_rml, preprocess.report):
     """
