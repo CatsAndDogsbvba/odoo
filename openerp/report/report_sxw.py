@@ -317,7 +317,7 @@ class rml_parse(object):
             # company in the localcontext. For other cases the report
             # will have to call setCompany() inside the main repeatIn loop.
             # SONNYEDIT 06/12/2016: check if the company of the object is the same as the user's company.
-            user = self.pool['res.users'].browse(self.cr, self.uid, self.uid, self.context)
+            user = self.pool['res.users'].browse(self.cr, self.uid, self.uid, self.localcontext)
             if user.company_id == objects[0].company_id:
                 self.setCompany(objects[0].company_id)
 
