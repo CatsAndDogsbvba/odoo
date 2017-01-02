@@ -1654,7 +1654,7 @@ class product_product(osv.Model):
     def _purchase_count(self, cr, uid, ids, field_name, arg, context=None):
         Purchase = self.pool['purchase.order']
         return {
-            product_id: Purchase.search_count(cr,uid, [('order_line.product_id', '=', product_id)], context=context) 
+            product_id: Purchase.search_count(cr,SUPERUSER_ID, [('order_line.product_id', '=', product_id)], context=context)
             for product_id in ids
         }
 
