@@ -1139,7 +1139,7 @@ class stock_picking(osv.osv):
             qty_uom = qty
             if product_uom.get(key[0]):
                 uom_id = product_uom[key[0]].id
-                qty_uom = uom_obj._compute_qty(cr, uid, product.uom_id.id, qty, uom_id)
+                qty_uom = uom_obj._compute_qty(cr, uid, product.uom_id.id, qty, uom_id, rounding_method='HALF-UP')
             val_dict = {
                 'picking_id': picking.id,
                 'product_qty': qty_uom,
