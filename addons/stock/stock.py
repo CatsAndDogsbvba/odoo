@@ -4084,23 +4084,23 @@ class stock_pack_operation(osv.osv):
         return res
 
     _columns = {
-        'picking_id': fields.many2one('stock.picking', 'Stock Picking', help='The stock operation where the packing has been made', required=True),
-        'product_id': fields.many2one('product.product', 'Product', ondelete="CASCADE"),  # 1
+        'picking_id': fields.many2one('stock.picking', 'Stock Picking', help='The stock operation where the packing has been made', required=True, select=2),
+        'product_id': fields.many2one('product.product', 'Product', ondelete="CASCADE", select=2),  # 1
         'product_uom_id': fields.many2one('product.uom', 'Product Unit of Measure'),
         'product_qty': fields.float('Quantity', digits_compute=dp.get_precision('Product Unit of Measure'), required=True),
         'qty_done': fields.float('Quantity Processed', digits_compute=dp.get_precision('Product Unit of Measure')),
-        'package_id': fields.many2one('stock.quant.package', 'Source Package'),  # 2
+        'package_id': fields.many2one('stock.quant.package', 'Source Package', select=2),  # 2
         'lot_id': fields.many2one('stock.production.lot', 'Lot/Serial Number'),
         'result_package_id': fields.many2one('stock.quant.package', 'Destination Package', help="If set, the operations are packed into this package", required=False, ondelete='cascade'),
         'date': fields.datetime('Date', required=True),
-        'owner_id': fields.many2one('res.partner', 'Owner', help="Owner of the quants"),
+        'owner_id': fields.many2one('res.partner', 'Owner', help="Owner of the quants", select=2),
         #'update_cost': fields.boolean('Need cost update'),
         'cost': fields.float("Cost", help="Unit Cost for this product line"),
         'currency': fields.many2one('res.currency', string="Currency", help="Currency in which Unit cost is expressed", ondelete='CASCADE'),
         'linked_move_operation_ids': fields.one2many('stock.move.operation.link', 'operation_id', string='Linked Moves', readonly=True, help='Moves impacted by this operation for the computation of the remaining quantities'),
         'remaining_qty': fields.function(_get_remaining_qty, type='float', digits = 0, string="Remaining Qty", help="Remaining quantity in default UoM according to moves matched with this operation. "),
-        'location_id': fields.many2one('stock.location', 'Source Location', required=True),
-        'location_dest_id': fields.many2one('stock.location', 'Destination Location', required=True),
+        'location_id': fields.many2one('stock.location', 'Source Location', required=True, select=2),
+        'location_dest_id': fields.many2one('stock.location', 'Destination Location', required=True, select=2),
         'processed': fields.selection([('true','Yes'), ('false','No')],'Has been processed?', required=True),
     }
 
