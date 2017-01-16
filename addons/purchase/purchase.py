@@ -1021,7 +1021,8 @@ class purchase_order(osv.osv):
 
             # create the new order
             context.update({'mail_create_nolog': True})
-            neworder_id = self.create(cr, uid, order_data)
+            ctx = {'merge': True}
+            neworder_id = self.create(cr, uid, order_data, context=ctx)
             self.message_post(cr, uid, [neworder_id], body=_("RFQ created"), context=context)
             orders_info.update({neworder_id: old_ids})
             allorders.append(neworder_id)
