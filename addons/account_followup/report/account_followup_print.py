@@ -61,17 +61,18 @@ class report_rappel(report_sxw.rml_parse):
         # lines_per_currency = {currency: [line data, ...], ...}
         lines_per_currency = defaultdict(list)
         for line in moveline_obj.browse(self.cr, self.uid, moveline_ids):
-            currency = line.currency_id or line.company_id.currency_id
-            line_data = {
-                'name': line.move_id.name,
-                'ref': line.ref,
-                'date': line.date,
-                'date_maturity': line.date_maturity,
-                'balance': line.amount_currency if currency != line.company_id.currency_id else line.debit - line.credit,
-                'blocked': line.blocked,
-                'currency_id': currency,
-            }
-            lines_per_currency[currency].append(line_data)
+            if not line.blocked:
+                currency = line.currency_id or line.company_id.currency_id
+                line_data = {
+                    'name': line.name,
+                    'ref': line.ref,
+                    'date': line.date,
+                    'date_maturity': line.date_maturity,
+                    'balance': line.amount_currency if currency != line.company_id.currency_id else line.debit - line.credit,
+                    'blocked': line.blocked,
+                    'currency_id': currency,
+                }
+                lines_per_currency[currency].append(line_data)
 
         return [{'line': lines, 'currency': currency} for currency, lines in lines_per_currency.items()]
 

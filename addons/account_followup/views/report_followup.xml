@@ -32,7 +32,6 @@
                                     <th class="text-center">Ref</th>
                                     <th class="text-center">Maturity Date</th>
                                     <th class="text-right">Amount</th>
-                                    <th class="text-center">Li.</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,13 +41,14 @@
                                     <td><span t-esc="line['ref']"/></td>
                                     <td class="text-center"><span t-esc="line['date_maturity'] and formatLang(line['date_maturity'], date=True)"/></td>
                                     <td class="text-right"><span t-esc="formatLang(line['balance'], currency_obj=line['currency_id'])"/></td>
-                                    <td><span t-esc="line['blocked'] and 'X' or ''"/></td>
                                 </tr>
                             </tbody>
                         </table>
 
                         <t t-set="total" t-value="reduce(lambda x,y: x+y['balance'], cur_lines['line'], 0.00)"/>
-                        <p>Total: <span t-esc="formatLang(total, currency_obj=cur_lines['currency'])"/></p>
+                        <div class="pull-right">
+                            <p><b>Total: <span t-esc="formatLang(total, currency_obj=cur_lines['currency'])"/></b></p>
+                        </div>
                     </t>
             </div>
             </t>

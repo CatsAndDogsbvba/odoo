@@ -1183,7 +1183,7 @@ msgstr "Totaal debet"
 #. module: account_followup
 #: view:website:account_followup.report_followup
 msgid "Total:"
-msgstr "Totaal:"
+msgstr "Totaal te betalen:"
 
 #. module: account_followup
 #: help:account_followup.followup.line,send_letter:0
