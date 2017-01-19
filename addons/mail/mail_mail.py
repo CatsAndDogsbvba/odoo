@@ -154,17 +154,18 @@ class mail_mail(osv.Model):
         link to action_mail_redirect action that will redirect to doc or Inbox """
         if context is None:
             context = {}
-        if partner and partner.user_ids:
-            base_url = self.pool.get('ir.config_parameter').get_param(cr, SUPERUSER_ID, 'web.base.url')
-            mail_model = mail.model or 'mail.thread'
-            url = urljoin(base_url, self.pool[mail_model]._get_access_link(cr, uid, mail, partner, context=context))
-            return "<span class='oe_mail_footer_access'><small>%(access_msg)s <a style='color:inherit' href='%(portal_link)s'>%(portal_msg)s</a></small></span>" % {
-                'access_msg': _('about') if mail.record_name else _('access'),
-                'portal_link': url,
-                'portal_msg': '%s %s' % (context.get('model_name', ''), mail.record_name) if mail.record_name else _('your messages'),
-            }
-        else:
-            return None
+        # if partner and partner.user_ids:
+        #     base_url = self.pool.get('ir.config_parameter').get_param(cr, SUPERUSER_ID, 'web.base.url')
+        #     mail_model = mail.model or 'mail.thread'
+        #     url = urljoin(base_url, self.pool[mail_model]._get_access_link(cr, uid, mail, partner, context=context))
+        #     return "<span class='oe_mail_footer_access'><small>%(access_msg)s <a style='color:inherit' href='%(portal_link)s'>%(portal_msg)s</a></small></span>" % {
+        #         'access_msg': _('about') if mail.record_name else _('access'),
+        #         'portal_link': url,
+        #         'portal_msg': '%s %s' % (context.get('model_name', ''), mail.record_name) if mail.record_name else _('your messages'),
+        #     }
+        # else:
+        # Do not add this footer
+        return None
 
     def send_get_mail_subject(self, cr, uid, mail, force=False, partner=None, context=None):
         """If subject is void, set the subject as 'Re: <Resource>' or
