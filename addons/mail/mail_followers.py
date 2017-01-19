@@ -173,7 +173,6 @@ class mail_notification(osv.Model):
         #     'odoo': "<a style='color:inherit' href='https://www.odoo.com/'>Odoo</a>"
         # })
         # footer = tools.append_content_to_html(footer, signature_company, plaintext=False, container_tag='div')
-        print footer
         return footer
 
     def update_message_notification(self, cr, uid, ids, message_id, partner_ids, context=None):
