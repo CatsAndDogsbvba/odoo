@@ -5,6 +5,8 @@ function update_product_image(event_source, product_id) {
     $img.attr("src", "/website/image/product.product/" + product_id + "/image");
     $img.parent().attr('data-oe-model', 'product.product').attr('data-oe-id', product_id)
         .data('oe-model', 'product.product').data('oe-id', product_id);
+    // The following line finds and updates the magnifyarea with the correct picture
+    $("body").find($("div.magnifyarea")).find($("img")).attr("src", "/website/image/product.product/" + product_id + "/image");
 }
 
 $('.oe_website_sale').each(function () {
@@ -196,6 +198,7 @@ $('.oe_website_sale').each(function () {
     });
 
     $(oe_website_sale).on('change', 'input.js_variant_change, select.js_variant_change, ul[data-attribute_value_ids]', function (ev) {
+        console.log('default');
         var $ul = $(ev.target).closest('.js_add_cart_variants');
         var $parent = $ul.closest('.js_product');
         var $product_id = $parent.find('input.product_id').first();
