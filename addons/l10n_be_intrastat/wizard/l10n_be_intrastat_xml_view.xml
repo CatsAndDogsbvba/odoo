@@ -51,7 +51,7 @@
 
         <menuitem
             name="Intrastat Declaration"
-            parent="l10n_be.menu_finance_belgian_statement"
+            parent="l10n_be_coa_multilang.menu_finance_belgian_statement"
             action="action_intrastat_xml_declaration"
             id="l10n_be_intrastat_xml_declaration"
             groups="account.group_account_manager"/>
