@@ -159,8 +159,6 @@ class stock_move(osv.osv):
         # SONNY 14-FEB-17: If qty<0; Do a check if the sale order's qty was negative, if so, return this qty on invoice
         # This is done so that negative quantities can be invoiced. [FERYN]
         if quantity <= 0 and move.procurement_id and move.procurement_id.sale_line_id:
-            print 'qty 0 eh'
-            print quantity
             if move.procurement_id.sale_line_id.product_uom_qty<0:
                 quantity = move.procurement_id.sale_line_id.product_uom_qty
 
