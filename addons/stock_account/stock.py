@@ -156,12 +156,6 @@ class stock_move(osv.osv):
             uos_id = move.product_uos.id
             quantity = move.product_uos_qty
 
-        # SONNY 14-FEB-17: If qty<0; Do a check if the sale order's qty was negative, if so, return this qty on invoice
-        # This is done so that negative quantities can be invoiced. [FERYN]
-        if quantity <= 0 and move.procurement_id and move.procurement_id.sale_line_id:
-            if move.procurement_id.sale_line_id.product_uom_qty<0:
-                quantity = move.procurement_id.sale_line_id.product_uom_qty
-
         taxes_ids = self._get_taxes(cr, uid, move, context=context)
 
         return {
