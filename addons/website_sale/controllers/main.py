@@ -176,6 +176,17 @@ class website_sale(http.Controller):
             if attrib:
                 domain += [('attribute_line_ids.value_ids', 'in', ids)]
 
+        # Check if the logged in user has a parent configured, if so check these brands, else check partner's brands
+        # FIXME when I am not a company, do I check the parent_company?
+        if request.env.user and request.env.user.id != 1:
+            partner = request.env.user.partner_id.parent_id or request.env.user.partner_id
+            brand_list = [x.id for x in partner.x_brand_ids]
+            if not brand_list:
+                # Get the public user's x_brand_ids
+                public_user = request.env['res.users'].sudo().search([('id', '=', 3), ('active', 'in', ['t', 'f'])])
+                brand_list = public_user and [x.id for x in public_user.partner_id.x_brand_ids] or []
+            domain.append(('product_brand_id', 'in', brand_list))
+        print domain
         return domain
 
     @http.route([

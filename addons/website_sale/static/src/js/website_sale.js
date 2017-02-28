@@ -32,17 +32,21 @@ $('.oe_website_sale').each(function () {
     $(oe_website_sale).on("change", 'input[name="add_qty"]', function (event) {
         product_ids = [];
         var product_dom = $(".js_product .js_add_cart_variants[data-attribute_value_ids]").last();
-        product_dom.data("attribute_value_ids").forEach(function(entry) {
-            product_ids.push(entry[0]);});
+        if (product_dom.data("attribute_value_ids")){
+            product_dom.data("attribute_value_ids").forEach(function(entry) {
+                product_ids.push(entry[0]);});
+        }
         var qty = $(event.target).closest('form').find('input[name="add_qty"]').val();
 
         openerp.jsonRpc("/shop/get_unit_price", 'call', {'product_ids': product_ids,'add_qty': parseInt(qty)})
         .then(function (data) {
             var current = product_dom.data("attribute_value_ids");
-            for(var j=0; j < current.length; j++){
-                current[j][2] = data[current[j][0]];
+            if (current){
+                for(var j=0; j < current.length; j++){
+                    current[j][2] = data[current[j][0]];
+                }
+                product_dom.attr("data-attribute_value_ids", JSON.stringify(current)).trigger("change");
             }
-            product_dom.attr("data-attribute_value_ids", JSON.stringify(current)).trigger("change");
         });
     });
 
