@@ -221,6 +221,7 @@ class xml_decl(osv.TransientModel):
                 and inv.type in (%s, %s)
                 and to_char(account_period.date_start, 'YYYY')=%s
                 and to_char(account_period.date_start, 'MM')=%s
+                and inv_line.quantity>0
             """
 
         cr.execute(sqlreq, (company.id, company.partner_id.country_id.code,
