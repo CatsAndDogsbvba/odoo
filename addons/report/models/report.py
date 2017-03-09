@@ -133,7 +133,7 @@ class Report(osv.Model):
         view_obj = self.pool['ir.ui.view']
 
         def translate_doc(doc_id, model, lang_field, template):
-            return self.translate_doc(cr, uid, doc_id, model, lang_field, template, values, context=context)
+            return self.translate_doc(cr, SUPERUSER_ID, doc_id, model, lang_field, template, values, context=context)
 
         user = self.pool['res.users'].browse(cr, uid, uid)
         website = None
