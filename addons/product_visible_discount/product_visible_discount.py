@@ -107,7 +107,7 @@ class sale_order_line(osv.osv):
             new_list_price = account_tax_obj._fix_tax_included_price(cr, uid, new_list_price, taxes, result.get('tax_id', []))
 
             if so_pricelist.visible_discount and list_price[pricelist][0] != 0 and new_list_price != 0:
-                if product.company_id and so_pricelist.currency_id.id != product.company_id.currency_id.id:
+                if product.company_id and so_pricelist.currency_id.id != product.company_id.sudo().currency_id.id:
                     # new_list_price is in company's currency while price in pricelist currency
                     ctx = context.copy()
                     ctx['date'] = date_order
