@@ -357,9 +357,18 @@ class xml_decl(osv.TransientModel):
             if extendedmode:
                 self._set_Dim(item, 'EXTPC', unicode(linekey.EXTPC))
                 self._set_Dim(item, 'EXDELTRM', unicode(linekey.EXDELTRM))
-            self._set_Dim(item, 'EXTXVAL', unicode(round(amounts[0], 0)).replace(".", ","))
-            self._set_Dim(item, 'EXWEIGHT', unicode(round(amounts[1], 0)).replace(".", ","))
-            self._set_Dim(item, 'EXUNITS', unicode(round(amounts[2], 0)).replace(".", ","))
+            if round(amounts[0], 0) > 0.0:
+                self._set_Dim(item, 'EXTXVAL', unicode(round(amounts[0], 0)).replace(".", ","))
+            else:
+                self._set_Dim(item, 'EXTXVAL', unicode(1.0).replace(".", ","))
+            if round(amounts[1], 0) > 0.0:
+                self._set_Dim(item, 'EXWEIGHT', unicode(round(amounts[1], 0)).replace(".", ","))
+            else:
+                self._set_Dim(item, 'EXWEIGHT', unicode(1.0).replace(".", ","))
+            if round(amounts[2], 0) > 0.0:
+                self._set_Dim(item, 'EXUNITS', unicode(round(amounts[2], 0)).replace(".", ","))
+            else:
+                self._set_Dim(item, 'EXUNITS', unicode(1.0).replace(".", ","))
 
         if numlgn == 0:
             #no datas
