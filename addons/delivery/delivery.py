@@ -222,17 +222,21 @@ class delivery_grid(osv.osv):
             volume += (line.product_id.volume or 0.0) * q
             quantity += q
         total = (order.amount_total or 0.0) - total_delivery
+        # SOVA: 27apr2017: Added total_excl as an option
+        total_excl = (order.amount_untaxed or 0.0) - total_delivery
 
         ctx = context.copy()
         ctx['date'] = order.date_order
         total = self.pool['res.currency'].compute(cr, uid, order.currency_id.id, order.company_id.currency_id.id, total, context=ctx)
-        return self.get_price_from_picking(cr, uid, id, total,weight, volume, quantity, context=context)
+        return self.get_price_from_picking(cr, uid, id, total, weight, volume, quantity, total_excl=total_excl,
+                                           context=context)
 
-    def get_price_from_picking(self, cr, uid, id, total, weight, volume, quantity, context=None):
+    def get_price_from_picking(self, cr, uid, id, total, weight, volume, quantity, total_excl=0, context=None):
         grid = self.browse(cr, uid, id, context=context)
         price = 0.0
         ok = False
-        price_dict = {'price': total, 'volume':volume, 'weight': weight, 'wv':volume*weight, 'quantity': quantity}
+        # SOVA: 27apr2017: Added total_excl as an option. The sig of this method is also adjusted
+        price_dict = {'price_excl': total_excl, 'price': total, 'volume':volume, 'weight': weight, 'wv':volume*weight, 'quantity': quantity}
         for line in grid.line_ids:
             test = eval(line.type+line.operator+str(line.max_value), price_dict)
             if test:
@@ -257,8 +261,8 @@ class delivery_grid_line(osv.osv):
         'sequence': fields.integer('Sequence', required=True, help="Gives the sequence order when calculating delivery grid."),
         'grid_id': fields.many2one('delivery.grid', 'Grid',required=True, ondelete='cascade'),
         'type': fields.selection([('weight','Weight'),('volume','Volume'),\
-                                  ('wv','Weight * Volume'), ('price','Price'), ('quantity','Quantity')],\
-                                  'Variable', required=True),
+                                  ('wv','Weight * Volume'), ('price','Price'), ('quantity','Quantity'),
+                                  ('price_excl', 'Price excl. taxes')], 'Variable', required=True),
         'operator': fields.selection([('==','='),('<=','<='),('<','<'),('>=','>='),('>','>')], 'Operator', required=True),
         'max_value': fields.float('Maximum Value', required=True),
         'price_type': fields.selection([('fixed','Fixed'),('variable','Variable')], 'Price Type', required=True),
