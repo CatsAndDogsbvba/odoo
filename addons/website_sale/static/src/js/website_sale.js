@@ -202,7 +202,6 @@ $('.oe_website_sale').each(function () {
     });
 
     $(oe_website_sale).on('change', 'input.js_variant_change, select.js_variant_change, ul[data-attribute_value_ids]', function (ev) {
-        console.log('default');
         var $ul = $(ev.target).closest('.js_add_cart_variants');
         var $parent = $ul.closest('.js_product');
         var $product_id = $parent.find('input.product_id').first();
