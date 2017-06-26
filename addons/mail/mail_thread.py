@@ -184,7 +184,7 @@ class mail_thread(osv.AbstractModel):
         result = []
         # SONNY edit 22 jun '17: Use SUPERUSER to avoid hidden AccessDenied errors
         for follower in self.pool.get('res.partner').browse(cr, SUPERUSER_ID, follower_ids, context=context):
-            is_editable = self.pool['res.users'].has_group(cr, uid, 'base.group_no_one')
+            is_editable = self.pool['res.users'].has_group(cr, SUPERUSER_ID, 'base.group_no_one')
             is_uid = uid in map(lambda x: x.id, follower.user_ids)
             data = (follower.id,
                     follower.name,
