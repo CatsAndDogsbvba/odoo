@@ -623,7 +623,8 @@ class product_template(osv.osv):
             # standard_price field can only be seen by users in base.group_user
             # Thus, in order to compute the sale price from the cost price for users not in this group
             # We fetch the standard price as the superuser
-            if ptype != 'standard_price':
+            # SONNY Edit: xx_msr_excl has the same accessibility as standard_price, so add it to the condition
+            if ptype not in ['standard_price', 'xx_msr_excl']:
                 res[product.id] = product[ptype] or 0.0
             else:
                 company_id = context.get('force_company') or product.env.user.company_id.id
