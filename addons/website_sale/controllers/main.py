@@ -185,8 +185,8 @@ class website_sale(http.Controller):
                 # Get the public user's x_brand_ids
                 public_user = request.env['res.users'].sudo().search([('id', '=', 3), ('active', 'in', ['t', 'f'])])
                 brand_list = public_user and [x.id for x in public_user.partner_id.x_brand_ids] or []
-            domain.append(('product_brand_id', 'in', brand_list))
-        print domain
+            if brand_list:
+                domain.append(('product_brand_id', 'in', brand_list))
         return domain
 
     @http.route([
