@@ -716,7 +716,7 @@ class website_sale(http.Controller):
         if not values['errors']:
             acquirer_ids = payment_obj.search(cr, SUPERUSER_ID, [('website_published', '=', True), ('company_id', '=', order.company_id.id)], context=context)
             values['acquirers'] = list(payment_obj.browse(cr, uid, acquirer_ids, context=context))
-            render_ctx = dict(context, submit_class='btn btn-primary', submit_txt=_('Pay Now'))
+            render_ctx = dict(context, submit_class='btn btn-primary', submit_txt=_('Confirm Order'))
             for acquirer in values['acquirers']:
                 acquirer.button = payment_obj.render(
                     cr, SUPERUSER_ID, acquirer.id,
@@ -790,7 +790,7 @@ class website_sale(http.Controller):
             tx_values={
                 'return_url': '/shop/payment/validate',
             },
-            context=dict(context, submit_class='btn btn-primary', submit_txt=_('Pay Now')))
+            context=dict(context, submit_class='btn btn-primary', submit_txt=_('Confirm Order')))
 
     @http.route('/shop/payment/get_status/<int:sale_order_id>', type='json', auth="public", website=True)
     def payment_get_status(self, sale_order_id, **post):
