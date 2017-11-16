@@ -22,6 +22,7 @@
 
 from openerp import SUPERUSER_ID
 from openerp.osv import fields, osv
+import openerp.addons.decimal_precision as dp
 from openerp.tools.translate import _
 
 class product_pricelist(osv.osv):
@@ -72,26 +73,26 @@ class sale_order_line(osv.osv):
         def get_real_price(res_dict, product_id, qty, uom, pricelist):
             return get_real_price_curency(res_dict, product_id, qty, uom, pricelist)[0]
 
-
-        res=super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist, product, qty,
-            uom, qty_uos, uos, name, partner_id,
-            lang, update_tax, date_order, packaging=packaging, fiscal_position=fiscal_position, flag=flag, context=context)
+        res = super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist, product, qty, uom, qty_uos, uos,
+                                                             name, partner_id, lang, update_tax, date_order,
+                                                             packaging=packaging, fiscal_position=fiscal_position,
+                                                             flag=flag, context=context)
 
         context = {'lang': lang, 'partner_id': partner_id}
-        result=res['value']
+        result = res['value']
         pricelist_obj=self.pool.get('product.pricelist')
         product_obj = self.pool.get('product.product')
         account_tax_obj = self.pool.get('account.tax')
         if product and pricelist and self.pool.get('res.users').has_group(cr, uid, 'sale.group_discount_per_so_line'):
-            if result.get('price_unit',False):
-                price=result['price_unit']
+            if result.get('price_unit', False):
+                price = result['price_unit']
             else:
                 return res
             uom = result.get('product_uom', uom)
             product = product_obj.browse(cr, uid, product, context)
             pricelist_context = dict(context, uom=uom, date=date_order)
             list_price = pricelist_obj.price_rule_get(cr, uid, [pricelist],
-                    product.id, qty or 1.0, partner_id, context=pricelist_context)
+                                                      product.id, qty or 1.0, partner_id, context=pricelist_context)
 
             so_pricelist = pricelist_obj.browse(cr, uid, pricelist, context=context)
 
@@ -114,6 +115,15 @@ class sale_order_line(osv.osv):
                     new_list_price = self.pool['res.currency'].compute(cr, uid,
                         currency_id.id, so_pricelist.currency_id.id,
                         new_list_price, context=ctx)
+
+                # ISSUE #33996: When a list_price had a higher precision than product price, this module would give
+                # a discount. EG: list_price in db = 12.03428571, list_price returned from read = 12.03
+                # The above would result in a discount of 0.04%. We now apply the precision rounding on the
+                # new_list_price as well.
+                product_precision = self.pool.get('decimal.precision').precision_get(cr, uid, 'Product Price')
+                if product_precision:
+                    new_list_price = round(new_list_price, product_precision)
+
                 discount = (new_list_price - price) / new_list_price * 100
                 if discount > 0:
                     result['price_unit'] = new_list_price
