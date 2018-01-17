@@ -582,15 +582,24 @@ instance.web.SearchView = instance.web.Widget.extend(/** @lends instance.web.Sea
 
         $.when.apply(null, started).then(function () {
             if (options && options.focus_input === false) return;
-            var input_to_focus;
-            // options.at: facet inserted at given index, focus next input
-            // otherwise just focus last input
-            if (!options || typeof options.at !== 'number') {
-                input_to_focus = _.last(self.input_subviews);
-            } else {
-                input_to_focus = self.input_subviews[(options.at + 1) * 2];
+            // Sonny core-code adjustment
+            // Check if focusing is needed
+            // We will only focus the search-field in case the media used has only screen, so a virtual keyboard
+            // would pop up if focused, this is something we prevent here.
+            console.log(navigator.userAgent);
+            var is_mobile = /Mobi|Android|/.test(navigator.userAgent);
+            console.log(is_mobile)
+            if(!is_mobile) {
+                var input_to_focus;
+                // options.at: facet inserted at given index, focus next input
+                // otherwise just focus last input
+                if (!options || typeof options.at !== 'number') {
+                    input_to_focus = _.last(self.input_subviews);
+                } else {
+                    input_to_focus = self.input_subviews[(options.at + 1) * 2];
+                }
+                input_to_focus.$el.focus();
             }
-            input_to_focus.$el.focus();
         });
     },
 
