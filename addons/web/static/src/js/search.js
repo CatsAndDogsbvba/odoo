@@ -586,7 +586,7 @@ instance.web.SearchView = instance.web.Widget.extend(/** @lends instance.web.Sea
             // Check if focusing is needed
             // We will only focus the search-field in case the media used has only screen, so a virtual keyboard
             // would pop up if focused, this is something we prevent here.
-            var is_mobile = /Mobi|Android|/.test(navigator.userAgent);
+            var is_mobile = /Mobi|Android/.test(navigator.userAgent);
             if(!is_mobile) {
                 var input_to_focus;
                 // options.at: facet inserted at given index, focus next input
