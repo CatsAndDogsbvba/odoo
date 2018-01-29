@@ -48,7 +48,6 @@ class crm_opportunity_report(osv.Model):
         'user_id':fields.many2one('res.users', 'User', readonly=True),
         'section_id':fields.many2one('crm.case.section', 'Sales Team', readonly=True),
         'country_id':fields.many2one('res.country', 'Country', readonly=True),
-        'company_id': fields.many2one('res.company', 'Company', readonly=True),
         'probability': fields.float('Probability',digits=(16,2),readonly=True, group_operator="avg"),
         'total_revenue': fields.float('Total Revenue',digits=(16,2),readonly=True),
         'expected_revenue': fields.float('Expected Revenue', digits=(16,2),readonly=True),
@@ -60,6 +59,10 @@ class crm_opportunity_report(osv.Model):
             ('lead','Lead'),
             ('opportunity','Opportunity'),
         ],'Type', help="Type is used to separate Leads and Opportunities"),
+        'maatschappij': fields.many2one('res.partner', 'Maatschappij', readonly=True),
+        'notaris': fields.many2one('res.partner', 'Notaris', readonly=True),
+        'agent': fields.many2one('res.partner', 'Agent', readonly=True),
+        'name': fields.char('Label', readonly=True)
     }
 
     def init(self, cr):
@@ -94,6 +97,11 @@ class crm_opportunity_report(osv.Model):
                     extract('epoch' from (c.date_closed-c.create_date))/(3600*24) as  delay_close,
                     abs(extract('epoch' from (c.date_deadline - c.date_closed))/(3600*24)) as  delay_expected,
                     extract('epoch' from (c.date_open-c.create_date))/(3600*24) as  delay_open
+                    , -- Some extra fields for JPL
+                    c.jpl_oa_mij_partner_id as maatschappij,
+                    c.jpl_oa_notaris_partner_id as notaris,
+                    c.jpl_oa_agent_partner_id as agent,
+                    c.name
                 FROM
                     crm_lead c
                 WHERE c.active = 'true'
