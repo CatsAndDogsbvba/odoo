@@ -10,5 +10,7 @@
         <city type="field" name="city"/>
         <state type="field" name="state_id.name"/>
         <country type="field" name="country_id.name"/>
+        <phone type="field" name="phone"/>
+        <mobile type="field" name="mobile"/>
     </address>
 </addresses>

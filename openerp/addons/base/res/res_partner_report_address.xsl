@@ -63,6 +63,8 @@
 		<para style="nospace"><xsl:value-of select="zip"/><xsl:text> </xsl:text><xsl:value-of select="city"/></para>
 		<para style="nospace"><xsl:value-of select="state"/></para>
 		<para style="nospace"><xsl:value-of select="country"/></para>
+		<para style="nospace"><xsl:value-of select="phone"/></para>
+		<para style="nospace"><xsl:value-of select="mobile"/></para>
 		<xsl:if test="position() &lt; last()">
 			<nextFrame/>
 		</xsl:if>
