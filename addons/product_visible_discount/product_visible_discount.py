@@ -105,6 +105,19 @@ class sale_order_line(osv.osv):
                 taxes = product.taxes_id.filtered(lambda r: r.company_id.id == context['company_id'])
             else:
                 taxes = product.taxes_id
+
+            # This module would subtract the vat-amount from the unit-price resulting in a wrong visual result.
+            # EG: Product unit_price is 2.20, discount = 22%, vat is 6% incl.
+            # Before the addition of tax_id in result the end result would be the following:
+            # price_unit 2.075; discount 17.3. While this is correct, users would be confused since they expected
+            # a 22% discount on 2.20euro, no matter what the tax_id is
+            # To solve this we add the taxes to the result, so that the fix_tax_included_price will not recompute
+            if 'tax_id' not in result:
+                if not ids:
+                    result['tax_id'] = [x.id for x in taxes if x.price_include]
+                else:
+                    result['tax_id'] = [x.id for x in self.browse(cr, uid, ids, context=context).tax_id]
+
             new_list_price = account_tax_obj._fix_tax_included_price(cr, uid, new_list_price, taxes, result.get('tax_id', []))
 
             if so_pricelist.visible_discount and list_price[pricelist][0] != 0 and new_list_price != 0:
