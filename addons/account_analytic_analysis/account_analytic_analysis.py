@@ -277,7 +277,10 @@ class account_analytic_account(osv.osv):
                 sale_orders = sale_order_obj.search(cr, uid, [('project_id', 'in', child_ids)], context=context)
                 sale_lines = self.pool.get('sale.order.line').search(cr, uid, [('order_id', 'in', sale_orders)], context=context)
                 for line in self.pool.get('sale.order.line').browse(cr, uid, sale_lines, context=context):
-                    invoice_lines.append(line.invoice_lines.id)
+                    # FIX: we now extend the list with a list of invoice_line_ids to avoid a singleton-error
+                    # If a sale_order_line gets picked in multiple moves and invoiced based on moves,
+                    # the sale_line will have multiple invoice_lines linked.
+                    invoice_lines.extend([x.id for x in line.invoice_lines])
                 inv_lines = inv_line_obj.search(cr, uid, [('id', 'in', invoice_lines)], context=context)
             if not inv_lines:
                 #Search all invoice lines not in cancelled state that refer to this analytic account
