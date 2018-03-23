@@ -112,13 +112,23 @@ class sale_order_line(osv.osv):
             # price_unit 2.075; discount 17.3. While this is correct, users would be confused since they expected
             # a 22% discount on 2.20euro, no matter what the tax_id is
             # To solve this we add the taxes to the result, so that the fix_tax_included_price will not recompute
-            if 'tax_id' not in result:
+            # This would add 6% taxes in inter_ou sales for example, so use a variable, instead of adding it to result.
+            # FIXME: fiscal_position : intra-comm -> This will give wrong prices
+            op_id = self.pool.get('operating.unit').search(cr, SUPERUSER_ID, [('partner_id', '=', partner_id)],
+                                                           context=context)
+            if 'tax_id' not in result and not op_id:
                 if not ids:
-                    result['tax_id'] = [x.id for x in taxes if x.price_include]
+                    valid_tax = [x.id for x in taxes if x.price_include]
                 else:
-                    result['tax_id'] = [x.id for x in self.browse(cr, uid, ids, context=context).tax_id]
+                    valid_tax = [x.id for x in self.browse(cr, uid, ids, context=context).tax_id]
+            else:
+                valid_tax = result.get('tax_id', [])
 
-            new_list_price = account_tax_obj._fix_tax_included_price(cr, uid, new_list_price, taxes, result.get('tax_id', []))
+            new_list_price = account_tax_obj._fix_tax_included_price(cr, uid, new_list_price, taxes, valid_tax)
+
+            # In case of inter-ou -> This works fine
+            # In case the client is a regular client --> This works as expected
+            # In case the client is regular, but intra-comm -> This does not work as expected
 
             if so_pricelist.visible_discount and list_price[pricelist][0] != 0 and new_list_price != 0:
                 if product.company_id and so_pricelist.currency_id.id != product.company_id.sudo().currency_id.id:
