@@ -974,7 +974,7 @@ msgstr "Afletteren van facturen en betalingen"
 #. module: account_followup
 #: view:website:account_followup.report_followup
 msgid "Ref"
-msgstr "Factuur"
+msgstr "Ref"
 
 #. module: account_followup
 #: code:addons/account_followup/account_followup.py:258
