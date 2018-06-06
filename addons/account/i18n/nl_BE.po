@@ -1432,6 +1432,7 @@ msgstr ""
 
 #. module: account
 #: view:account.analytic.account:account.view_account_analytic_account_search
+#: view:analytic.entries.report:account.view_analytic_entries_report_search
 #: view:account.analytic.line:account.view_account_analytic_line_filter
 #: field:account.entries.report,analytic_account_id:0
 #: field:account.invoice.line,account_analytic_id:0
@@ -1440,7 +1441,7 @@ msgstr ""
 #: field:account.move.line.reconcile.writeoff,analytic_id:0
 #: field:account.statement.operation.template,analytic_account_id:0
 msgid "Analytic Account"
-msgstr "Analytische rekening"
+msgstr "Kostenplaats"
 
 #. module: account
 #: view:account.analytic.chart:account.account_analytic_chart_view

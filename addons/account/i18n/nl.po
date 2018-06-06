@@ -1433,6 +1433,7 @@ msgstr "Kostenplaats"
 
 #. module: account
 #: view:account.analytic.account:account.view_account_analytic_account_search
+#: view:analytic.entries.report:account.view_analytic_entries_report_search
 #: view:account.analytic.line:account.view_account_analytic_line_filter
 #: field:account.entries.report,analytic_account_id:0
 #: field:account.invoice.line,account_analytic_id:0
