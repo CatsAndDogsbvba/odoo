@@ -28,6 +28,7 @@
                             <thead>
                                 <tr>
                                     <th>Invoice Date</th>
+                                    <th class="text-center">Doc. nr.</th>
                                     <th>Description</th>
                                     <th class="text-center">Ref</th>
                                     <th class="text-center">Maturity Date</th>
@@ -37,6 +38,7 @@
                             <tbody>
                                 <tr t-foreach="cur_lines['line']" t-as="line">
                                     <td><span t-esc="formatLang(line['date'],date = True)"/></td>
+                                    <td><span t-esc="line['doc_nr']"/></td>
                                     <td><span t-esc="line['name']"/></td>
                                     <td><span t-esc="line['ref']"/></td>
                                     <td class="text-center"><span t-esc="line['date_maturity'] and formatLang(line['date_maturity'], date=True)"/></td>

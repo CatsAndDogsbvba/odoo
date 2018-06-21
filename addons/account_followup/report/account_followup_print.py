@@ -65,6 +65,7 @@ class report_rappel(report_sxw.rml_parse):
                 currency = line.currency_id or line.company_id.currency_id
                 line_data = {
                     'name': line.name,
+                    'doc_nr': line.move_id.name,
                     'ref': line.ref,
                     'date': line.date,
                     'date_maturity': line.date_maturity,
