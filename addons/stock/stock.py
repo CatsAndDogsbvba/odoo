@@ -416,15 +416,21 @@ class stock_quant(osv.osv):
             to_recompute_move_ids = [x.reservation_id.id for x in to_move_quants if x.reservation_id and x.reservation_id.id != move.id]
             self.move_quants_write(cr, uid, to_move_quants, move, location_to, dest_package_id, context=context)
             self.pool.get('stock.move').recalculate_move_state(cr, uid, to_recompute_move_ids, context=context)
-        if location_to.usage == 'internal':
-            # Do manual search for quant to avoid full table scan (order by id)
-            cr.execute("""
-                SELECT 0 FROM stock_quant, stock_location WHERE product_id = %s AND stock_location.id = stock_quant.location_id AND
-                ((stock_location.parent_left >= %s AND stock_location.parent_left < %s) OR stock_location.id = %s) AND qty < 0.0 LIMIT 1
-            """, (move.product_id.id, location_to.parent_left, location_to.parent_right, location_to.id))
-            if cr.fetchone():
-                for quant in quants_reconcile:
-                    self._quant_reconcile_negative(cr, uid, quant, move, context=context)
+        # Comment the next portion:
+        # The reason to do this is that by reconciling negative quants, the system would
+        # sometimes hi-jack moves to reconcile quants that were initially invoked because
+        # of the transfer of moves that were force_assigned.
+        # The moves that got hi-jacked would then be in 'waiting' state forever, resulting
+        # in users clicking force_assign on these moves as well.
+        # if location_to.usage == 'internal':
+        #     # Do manual search for quant to avoid full table scan (order by id)
+        #     cr.execute("""
+        #         SELECT 0 FROM stock_quant, stock_location WHERE product_id = %s AND stock_location.id = stock_quant.location_id AND
+        #         ((stock_location.parent_left >= %s AND stock_location.parent_left < %s) OR stock_location.id = %s) AND qty < 0.0 LIMIT 1
+        #     """, (move.product_id.id, location_to.parent_left, location_to.parent_right, location_to.id))
+        #     if cr.fetchone():
+        #         for quant in quants_reconcile:
+        #             self._quant_reconcile_negative(cr, uid, quant, move, context=context)
 
     def move_quants_write(self, cr, uid, quants, move, location_dest_id, dest_package_id, context=None):
         context=context or {}
