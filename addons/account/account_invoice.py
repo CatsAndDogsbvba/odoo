@@ -27,6 +27,9 @@ from openerp import models, fields, api, _
 from openerp.exceptions import except_orm, Warning, RedirectWarning
 from openerp.tools import float_compare
 import openerp.addons.decimal_precision as dp
+import logging
+
+_logger = logging.getLogger(__name__)
 
 # mapping invoice type to journal type
 TYPE2JOURNAL = {
@@ -726,12 +729,20 @@ class account_invoice(models.Model):
                 key = (tax.tax_code_id.id, tax.base_code_id.id, tax.account_id.id)
                 tax_key.append(key)
                 if key not in compute_taxes:
+                    _logger.warning('Warning!, Global taxes defined, but they are not in invoice lines !')
+                    _logger.warning('Warning!, invoice(s): {}!'.format(self.ids))
+                    _logger.warning('Warning!, key: {}!'.format(key))
+                    _logger.warning('Warning!, compute_taxes: {}!'.format(compute_taxes))
                     raise except_orm(_('Warning!'), _('Global taxes defined, but they are not in invoice lines !'))
                 base = compute_taxes[key]['base']
                 if float_compare(abs(base - tax.base), company_currency.rounding, precision_digits=precision) == 1:
+                    _logger.warning('Warning!, Tax base different!')
+                    _logger.warning('Warning!, invoice(s): {}!'.format(self.ids))
                     raise except_orm(_('Warning!'), _('Tax base different!\nClick on compute to update the tax base.'))
             for key in compute_taxes:
                 if key not in tax_key:
+                    _logger.warning('Warning!, Taxes are missing!')
+                    _logger.warning('Warning!, invoice(s): {}!'.format(self.ids))
                     raise except_orm(_('Warning!'), _('Taxes are missing!\nClick on compute button.'))
 
     @api.multi
