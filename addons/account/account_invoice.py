@@ -1059,7 +1059,9 @@ class account_invoice(models.Model):
         result = []
         for inv in self:
             result.append((inv.id, "%s %s" % (inv.number or TYPES[inv.type], inv.name or '')))
-        return result
+        # tickets/44602
+        # limit inv.name to 250 characters
+        return [(x[0], x[1][:250]) for x in result]
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
