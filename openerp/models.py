@@ -3496,7 +3496,7 @@ class BaseModel(object):
                     # errors for non-transactional search/read sequences coming from clients
                     return
                 warnmsg = 'Failed operation on deleted record(s): {}, uid: {}, model: {}, missing: {}'\
-                    .format(operation, uid, self._name, missing_ids[:10])
+                    .format(operation, uid, self._name, missing_ids)
                 _logger.warning(warnmsg)
                 raise MissingError(
                     _('One of the documents you are trying to access has been deleted, please try again after refreshing.'))
